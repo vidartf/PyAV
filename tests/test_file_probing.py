@@ -1,4 +1,6 @@
 from fractions import Fraction
+from subprocess import check_output
+import json
 import sys
 
 from .common import fate_suite, av, TestCase
@@ -9,81 +11,75 @@ except NameError:
     long = int
 
 
-class TestAudioProbe(TestCase):
-    def setUp(self):
-        self.file = av.open(fate_suite('aac/latm_stereo_to_51.ts'))
+class TestProbe(TestCase):
 
-    def test_container_probing(self):
-        self.assertEqual(str(self.file.format), "<av.ContainerFormat 'mpegts'>")
-        self.assertEqual(self.file.format.name, 'mpegts')
-        self.assertEqual(self.file.format.long_name, "MPEG-TS (MPEG-2 Transport Stream)")
-        self.assertEqual(self.file.size, 207740)
+    def get_probe(self, file):
+        return json.loads(check_output(
+            'ffprobe -v quiet -print_format json -show_format -show_streams'.split()
+            + [file]
+        ))
 
-        # This is a little odd, but on OS X with FFmpeg we get a different value.
-        self.assertIn(self.file.bit_rate, (269558, 270494))
+    def assertContainer(self, fh, probe):
+        self.assertEqual(fh.format.name, probe['format_name'])
+        self.assertEqual(fh.format.long_name, probe['format_long_name'])
+        self.assertEqual(fh.size, int(probe['size']))
+        self.assertEqual(fh.bit_rate, int(probe['bit_rate']))
+        self.assertEqual(fh.start_time, int(float(probe['start_time']) * av.time_base))
+        self.assertEqual(fh.metadata, {})
 
-        self.assertEqual(len(self.file.streams), 1)
-        self.assertEqual(self.file.start_time, long(1400000))
-        self.assertEqual(self.file.metadata, {})
+    def assertBasicStream(self, stream, probe):
+        self.assertEqual(stream.index, probe['index'])
+        self.assertEqual(stream.type, probe['codec_type'])
+        self.assertEqual(stream.name, probe['codec_name'])
+        self.assertEqual(stream.long_name, probe['codec_long_name'])
 
-    def test_stream_probing(self):
-        stream = self.file.streams[0]
-        self.assertEqual(stream.index, 0)
-        self.assertEqual(stream.type, 'audio')
-        self.assertEqual(stream.name, 'aac_latm')
-        self.assertEqual(stream.long_name, 'AAC LATM (Advanced Audio Coding LATM syntax)')
-        self.assertEqual(stream.bit_rate, None)
-        self.assertEqual(stream.max_bit_rate, None)
-        self.assertEqual(stream.channels, 2)
-        self.assertEqual(stream.layout.name, 'stereo')
-        self.assertEqual(stream.rate, 48000)
-        self.assertEqual(stream.format.name, 'fltp')
-        self.assertEqual(stream.format.bits, 32)
-        self.assertEqual(stream.language, "eng")
+    def assertAudioStream(self, stream, probe):
+        self.assertBasicStream(stream, probe)
+        self.assertEqual(stream.channels, int(probe['channels']))
+        self.assertEqual(stream.layout.name, probe['channel_layout'])
+        self.assertEqual(stream.rate, int(probe['sample_rate']))
+        self.assertEqual(stream.format.name, probe['sample_fmt'])
 
+    def assertVideoStream(self, stream, probe):
+        self.assertBasicStream(stream, probe)
 
-class TestVideoProbe(TestCase):
-    def setUp(self):
-        self.file = av.open(fate_suite('mpeg2/mpeg2_field_encoding.ts'))
+        self.assertEqual(stream.profile, probe['profile'])
 
-    def test_container_probing(self):
-        self.assertEqual(str(self.file.format), "<av.ContainerFormat 'mpegts'>")
-        self.assertEqual(self.file.format.name, 'mpegts')
-        self.assertEqual(self.file.format.long_name, "MPEG-TS (MPEG-2 Transport Stream)")
-        self.assertEqual(self.file.size, 800000)
+        if 'bit_rate' in probe:
+            self.assertEqual(stream.bit_rate, int(probe['bit_rate']))
+        self.assertEqual(stream.max_bit_rate, int(probe['max_bit_rate']))
 
-        # This is a little odd, but on OS X with FFmpeg we get a different value.
-        self.assertIn(self.file.duration, (1620000, 1580000))
+        self.assertEqual(
+            str(stream.sample_aspect_ratio).replace('/', ':'),
+            probe['sample_aspect_ratio']
+        )
+        self.assertEqual(
+            str(stream.display_aspect_ratio).replace('/', ':'),
+            probe['display_aspect_ratio']
+        )
+        self.assertEqual(stream.format.name, probe['pix_fmt'])
+        self.assertEqual(stream.has_b_frames, bool(int(probe['has_b_frames'])))
+        self.assertEqual(
+            '%d/%d' % (stream.average_rate.numerator, stream.average_rate.denominator),
+            probe['avg_frame_rate']
+        )
+        
+        self.assertEqual(stream.width, int(probe['width']))
+        self.assertEqual(stream.height, int(probe['height']))
 
-        self.assertEqual(self.file.bit_rate, 8 * self.file.size * av.time_base / self.file.duration)
-        self.assertEqual(len(self.file.streams), 1)
-        self.assertEqual(self.file.start_time, long(22953408322))
-        self.assertEqual(self.file.size, 800000)
-        self.assertEqual(self.file.metadata, {})
+    def test_mpeg2_ts_audio(self):
+        path = fate_suite('aac/latm_stereo_to_51.ts')
+        fh = av.open(path)
+        probe = self.get_probe(path)
+        self.assertContainer(fh, probe['format'])
+        self.assertEqual(len(fh.streams), len(probe['streams']))
+        self.assertAudioStream(fh.streams[0], probe['streams'][0])
 
-    def test_stream_probing(self):
-        stream = self.file.streams[0]
-        self.assertEqual(stream.index, 0)
-        self.assertEqual(stream.type, 'video')
-        self.assertEqual(stream.name, 'mpeg2video')
-        self.assertEqual(stream.long_name, 'MPEG-2 video')
-        self.assertEqual(stream.profile, 'Simple')
+    def test_mpeg2_ts_video(self):
+        path = fate_suite('mpeg2/mpeg2_field_encoding.ts')
+        fh = av.open(path)
+        probe = self.get_probe(path)
+        self.assertContainer(fh, probe['format'])
+        self.assertEqual(len(fh.streams), len(probe['streams']))
+        self.assertVideoStream(fh.streams[0], probe['streams'][0])
 
-        # Libav is able to return a bit-rate for this file, but ffmpeg doesn't,
-        # so have to rely on rc_max_rate.
-        try:
-            self.assertEqual(stream.bit_rate, None)
-            self.assertEqual(stream.max_bit_rate, 3364800)
-        except AssertionError:
-            self.assertEqual(stream.bit_rate, 3364800)
-
-        self.assertEqual(stream.sample_aspect_ratio, Fraction(16, 15))
-        self.assertEqual(stream.display_aspect_ratio, Fraction(4, 3))
-        self.assertEqual(stream.gop_size, 12)
-        self.assertEqual(stream.format.name, 'yuv420p')
-        self.assertFalse(stream.has_b_frames)
-        self.assertEqual(stream.average_rate, Fraction(25, 1))
-        self.assertEqual(stream.width, 720)
-        self.assertEqual(stream.height, 576)
-        self.assertEqual(stream.coded_width, 720)
-        self.assertEqual(stream.coded_height, 576)
