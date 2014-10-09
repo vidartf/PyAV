@@ -1,6 +1,6 @@
 from fractions import Fraction
-from subprocess import check_output
 import json
+import subprocess
 import sys
 
 from .common import fate_suite, av, TestCase
@@ -13,11 +13,12 @@ except NameError:
 
 class TestProbe(TestCase):
 
-    def get_probe(self, file):
-        return json.loads(check_output(
-            'ffprobe -v quiet -print_format json -show_format -show_streams'.split()
-            + [file]
-        ))
+    def get_probe(self, path):
+        cmd = 'ffprobe -v quiet -print_format json -show_format -show_streams'.split()
+        cmd.append(path)
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        out, _ = proc.communicate()
+        return json.loads(out)
 
     def assertContainer(self, fh, probe):
         self.assertEqual(fh.format.name, probe['format_name'])
