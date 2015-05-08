@@ -1,0 +1,30 @@
+# This won't possibly work, but we need to start somewhere.
+
+install:
+
+    - set PATH=%PATH%;C:\MinGW\bin
+
+    # Install ffmpeg dev
+    - curl -kLO http://ffmpeg.zeranoe.com/builds/win32/dev/ffmpeg-20140222-git-44b22bb-win32-dev.7z
+    - 7z x ffmpeg-20140222-git-44b22bb-win32-dev.7z
+    - set PYAV_FFMPEG_DEV=%CD%\ffmpeg-20140222-git-44b22bb-win32-dev
+
+    # Install ffmpeg shared
+    - curl -kLO http://ffmpeg.zeranoe.com/builds/win32/shared/ffmpeg-20140222-git-44b22bb-win32-shared.7z
+    - 7z x ffmpeg-20140222-git-44b22bb-win32-shared.7z
+    - set PYAV_FFMPEG=%CD%\ffmpeg-20140222-git-44b22bb-win32-shared
+
+    # Install ffmpeg source (for pkg-config)
+    - curl -kLO http://ffmpeg.zeranoe.com/builds/source/ffmpeg/ffmpeg-20150507-git-9253cc4.tar.xz
+    - mkdir src
+    - cd src
+    - tar -xf ../ffmpeg-20150507-git-9253cc4.tar.xz
+    - ./configure --prefix %PYAV_FFMPEG%
+    - cd ..
+
+    # GCC and Make
+    - mingw-get install gcc mingw32-make pkg-config
+
+
+build_script:
+    - mingw32-make build-mingw32
