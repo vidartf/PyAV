@@ -1,0 +1,39 @@
+
+Wrapped C Types and Functions
+==========================
+
+.. warning::
+
+    This is far from a comprehensive list, but we hope to improve it as we go.
+
+
+libavformat/avformat.pxd
+-----------------------------------
+
+.. c:function:: av_register_all()
+
+      Initialize libavformat 
+
+.. c:type:: struct AVFrac
+
+      See: :ffstruct:`FFmpeg's docs <AVFrac>`.
+
+.. c:type:: struct AVStream
+
+      See: :ffstruct:`FFmpeg's docs <AVStream>`.
+
+.. c:function:: avformat_open_input(...)
+
+      Options are passed via :func:`av.open`.
+
+      .. seealso:: FFmpeg's docs: :ffmpeg:`avformat_open_input`
+
+
+.. c:function:: avformat_write_header(...)
+
+      Options are passed via :func:`av.open`; called in
+      :meth:`av.container.OutputContainer.start_encoding`.
+
+      .. seealso:: FFmpeg's docs: :ffmpeg:`avformat_write_header`
+
+
