@@ -1,3 +1,7 @@
+from libc.stdint cimport uint8_t
+
+from av.utils cimport ByteSource
+
 
 cdef class Packet(object):
     
@@ -55,3 +59,9 @@ cdef class Packet(object):
     property duration:
         def __get__(self): return None if self.struct.duration == lib.AV_NOPTS_VALUE else self.struct.duration
 
+    # this is super-temporary 
+    def _set_payload(self, payload):
+        cdef ByteSource source = ByteSource(payload)
+        self.struct.data = source.ptr
+        self.struct.size = source.length
+        return source
