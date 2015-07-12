@@ -85,7 +85,7 @@
 <p>For devices (via <cite>libavdevice</cite>), pass the name of the device to <code class="docutils literal"><span class="pre">format</span></code>,
 e.g.:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c"># Open webcam on OS X.</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">av</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="s">&#39;avfoundation&#39;</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="s">&#39;0&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">av</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="s">&#39;avfoundation&#39;</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="s">&#39;0&#39;</span><span class="p">)</span> 
 </pre></div>
 </div>
 </dd></dl>
@@ -135,9 +135,9 @@ e.g.:</p>
 
 <dl class="method">
 <dt id="av.container.InputContainer.demux">
-<code class="descname">demux</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#av.container.InputContainer.demux" title="Permalink to this definition">¶</a></dt>
+<code class="descname">demux</code><span class="sig-paren">(</span><em>streams=None</em><span class="sig-paren">)</span><a class="headerlink" href="#av.container.InputContainer.demux" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yields a series of <a class="reference internal" href="#av.packet.Packet" title="av.packet.Packet"><code class="xref py py-class docutils literal"><span class="pre">Packet</span></code></a> from the given set of <a class="reference internal" href="#av.stream.Stream" title="av.stream.Stream"><code class="xref py py-class docutils literal"><span class="pre">Stream</span></code></a></p>
-<p>The last packet is a dummy packet, that when decoded will flush the buffers.</p>
+<p>The last packets are dummy packets that when decoded will flush the buffers.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -755,14 +755,14 @@ packets until there are none left, at which it will return None.</p>
 <code class="descname">format</code><a class="headerlink" href="#av.video.frame.VideoFrame.format" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="staticmethod">
 <dt id="av.video.frame.VideoFrame.from_image">
-<code class="descname">from_image</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#av.video.frame.VideoFrame.from_image" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">from_image</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#av.video.frame.VideoFrame.from_image" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="staticmethod">
 <dt id="av.video.frame.VideoFrame.from_ndarray">
-<code class="descname">from_ndarray</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#av.video.frame.VideoFrame.from_ndarray" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">from_ndarray</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#av.video.frame.VideoFrame.from_ndarray" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -1285,6 +1285,46 @@ will have accurate timestamps (assuming a time_base or 1/sample_rate).</p>
 </dd></dl>
 
 </div>
+<div class="section" id="utilities">
+<h2>Utilities<a class="headerlink" href="#utilities" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-av.logging">
+<span id="logging"></span><h3>Logging<a class="headerlink" href="#module-av.logging" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="av.logging.get_level">
+<code class="descclassname">av.logging.</code><code class="descname">get_level</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#av.logging.get_level" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return current logging threshold.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="av.logging.set_level">
+<code class="descclassname">av.logging.</code><code class="descname">set_level</code><span class="sig-paren">(</span><em>level</em><span class="sig-paren">)</span><a class="headerlink" href="#av.logging.set_level" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set logging threshold.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="av.logging.set_log_after_shutdown">
+<code class="descclassname">av.logging.</code><code class="descname">set_log_after_shutdown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#av.logging.set_log_after_shutdown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set if logging should continue after Python shutdown.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-av.utils">
+<span id="other"></span><h3>Other<a class="headerlink" href="#module-av.utils" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="av.utils.AVError">
+<em class="property">class </em><code class="descclassname">av.utils.</code><code class="descname">AVError</code><a class="headerlink" href="#av.utils.AVError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="http://docs.python.org/library/exceptions.html#exceptions.EnvironmentError" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">exceptions.EnvironmentError</span></code></a></p>
+<p>Exception class for errors from within the underlying FFmpeg/Libav.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="av.utils.ByteSource">
+<em class="property">class </em><code class="descclassname">av.utils.</code><code class="descname">ByteSource</code><a class="headerlink" href="#av.utils.ByteSource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="http://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+</dd></dl>
+
+</div>
+</div>
 </div>
 
 
@@ -1322,6 +1362,11 @@ will have accurate timestamps (assuming a time_base or 1/sample_rate).</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-av.subtitles.stream">Subtitles</a></li>
+<li><a class="reference internal" href="#utilities">Utilities</a><ul>
+<li><a class="reference internal" href="#module-av.logging">Logging</a></li>
+<li><a class="reference internal" href="#module-av.utils">Other</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

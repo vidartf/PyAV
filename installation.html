@@ -66,17 +66,26 @@
 <li><code class="docutils literal"><span class="pre">libswscale</span></code></li>
 <li><code class="docutils literal"><span class="pre">libswresample</span></code> or <code class="docutils literal"><span class="pre">libavresample</span></code></li>
 </ul>
+<p>and a few other tools in general:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">pkg-config</span></code></li>
+<li>Python&#8217;s development headers</li>
+</ul>
 <div class="section" id="mac-os-x">
 <h3>Mac OS X<a class="headerlink" href="#mac-os-x" title="Permalink to this headline">¶</a></h3>
 <p>On <strong>Mac OS X</strong>, <a class="reference external" href="http://brew.sh/">Homebrew</a> saves the day:</p>
-<div class="highlight-python"><div class="highlight"><pre>brew install ffmpeg
+<div class="highlight-python"><div class="highlight"><pre>brew install ffmpeg pkg-config
 </pre></div>
 </div>
 </div>
 <div class="section" id="ubuntu-14-04-lts">
 <h3>Ubuntu 14.04 LTS<a class="headerlink" href="#ubuntu-14-04-lts" title="Permalink to this headline">¶</a></h3>
 <p>On <strong>Ubuntu 14.04 LTS</strong> everything can come from the default sources:</p>
-<div class="highlight-python"><div class="highlight"><pre>sudo apt-get install -y \
+<div class="highlight-python"><div class="highlight"><pre># general dependencies
+sudo apt-get install -y python-dev pkg-config
+
+# library components
+sudo apt-get install -y \
     libavformat-dev libavcodec-dev libavdevice-dev \
     libavutil-dev libswscale-dev libavresample-dev \
 </pre></div>
