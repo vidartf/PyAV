@@ -230,11 +230,7 @@ cdef class Container(object):
             self.file = file
             self.proxy = ContainerProxy(_base_constructor_sentinel, None, file, writing)
 
-        if options is not None:
-            dict_to_avdict(&self.options, options)
-
-    def __dealloc__(self):
-        with nogil: lib.av_dict_free(&self.options)
+        self._options = options
 
     def __repr__(self):
         return '<av.%s %r>' % (self.__class__.__name__, self.file or self.name)
@@ -246,25 +242,37 @@ cdef class InputContainer(Container):
 
         cdef char *name = "" if self.proxy.file is not None else self.name
         cdef lib.AVInputFormat *fmt = self.format.iptr if self.format else NULL
+        
+        cdef lib.AVDictionary *options = NULL
+        if self._options is not None:
+            dict_to_avdict(&options, self._options)
+
         with nogil:
             ret = lib.avformat_open_input(
                 &self.proxy.ptr,
                 name,
                 fmt,
-                &self.options if self.options else NULL
+                &options if options != NULL else NULL
             )
+        if options != NULL:
+            lib.av_dict_free(&options)
         self.proxy.err_check(ret)
 
         self.format = self.format or build_container_format(self.proxy.ptr.iformat, self.proxy.ptr.oformat)
 
+        # Our understanding is that there is little overlap bettween
+        # options for containers and streams, so we use the same dict.
+        # Possible TODO: expose per-stream options.
+        if self._options is not None:
+            dict_to_avdict(&options, self._options)
+
         with nogil:
             ret = lib.avformat_find_stream_info(
                 self.proxy.ptr,
-                # Our understanding is that there is little overlap bettween
-                # options for containers and streams, so we use the same dict.
-                # Possible TODO: expose per-stream options.
-                &self.options if self.options else NULL
+                &options if options != NULL else NULL
             )
+        if options != NULL:
+            lib.av_dict_free(&options)
         self.proxy.err_check(ret)
 
         self.streams = list(
@@ -503,18 +511,28 @@ cdef class OutputContainer(Container):
         if self._started:
             return
 
+        cdef lib.AVDictionary *options = NULL
+        cdef int res
+
         # Make sure all of the streams are open.
         cdef Stream stream
         for stream in self.streams:
             if not lib.avcodec_is_open(stream._codec_context):
-                self.proxy.err_check(lib.avcodec_open2(
-                    stream._codec_context,
-                    stream._codec,
-                    # Our understanding is that there is little overlap bettween
-                    # options for containers and streams, so we use the same dict.
-                    # Possible TODO: expose per-stream options.
-                    &self.options if self.options else NULL
-                ))
+                if self._options is not None:
+                    dict_to_avdict(&options, self._options)
+                with nogil:
+                    res = lib.avcodec_open2(
+                        stream._codec_context,
+                        stream._codec,
+                        # Our understanding is that there is little overlap bettween
+                        # options for containers and streams, so we use the same dict.
+                        # Possible TODO: expose per-stream options.
+                        &options if options != NULL else NULL
+                    )
+                if options != NULL:
+                    lib.av_dict_free(&options)
+                self.proxy.err_check(res)
+
             dict_to_avdict(&stream._stream.metadata, stream.metadata, clear=True)
 
         # Open the output file, if needed.
@@ -523,10 +541,16 @@ cdef class OutputContainer(Container):
             if not self.proxy.ptr.oformat.flags & lib.AVFMT_NOFILE:
                 err_check(lib.avio_open(&self.proxy.ptr.pb, self.name, lib.AVIO_FLAG_WRITE))
             dict_to_avdict(&self.proxy.ptr.metadata, self.metadata, clear=True)
-            err_check(lib.avformat_write_header(
-                self.proxy.ptr, 
-                &self.options if self.options else NULL
-            ))
+            if self._options is not None:
+                dict_to_avdict(&options, self._options)
+            with nogil:
+                res = lib.avformat_write_header(
+                    self.proxy.ptr, 
+                    &options if options != NULL else NULL
+                )
+            if options != NULL:
+                lib.av_dict_free(&options)
+            err_check(res)
 
         self._started = True
             

@@ -41,7 +41,8 @@ cdef class Container(object):
     cdef readonly object file
 
     cdef readonly ContainerFormat format
-    cdef lib.AVDictionary *options
+
+    cdef object _options
 
     cdef ContainerProxy proxy
     cdef object __weakref__
