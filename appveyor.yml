@@ -109,7 +109,7 @@ test_script:
 
 after_test:
   # If tests are successful, create binary packages for the project.
-  - "%CMD_IN_ENV% %PYTHON%/python setup.py build_ext --include-dirs=ffmpeg-2.7-win64-dev/include --library-dirs=ffmpeg-2.7-win64-shared/lib
+  - "%CMD_IN_ENV% %PYTHON%/python setup.py build_ext --include-dirs=ffmpeg-2.7-win64-dev/include --library-dirs=ffmpeg-2.7-win64-shared/lib"
   - "%CMD_IN_ENV% %PYTHON%/python setup.py bdist_wheel"
   - ps: "ls dist"
 
