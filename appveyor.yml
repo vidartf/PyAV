@@ -104,7 +104,7 @@ build: false  # Not a C# project, build stuff at the test step instead.
 
 before_test:
   # Need to build before tests
-  - "%CMD_IN_ENV% %PYTHON%/python setup.py build_ext --debug --ffmpeg-dir=%cd%\\ffmpeg-2.7-win%PYTHON_ARCH%-dev --include-dirs=%cd%\\msinttypes"
+  - "%CMD_IN_ENV% %PYTHON%/python setup.py build_ext --ffmpeg-dir=%cd%\\ffmpeg-2.7-win%PYTHON_ARCH%-dev --include-dirs=%cd%\\msinttypes"
 
 test_script:
   # Build the compiled extension and run the project tests
