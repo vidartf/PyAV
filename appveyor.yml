@@ -96,9 +96,9 @@ install:
 
   # Install ffmpeg
   - ps: Start-FileDownload 'http://ffmpeg.zeranoe.com/builds/win64/shared/ffmpeg-2.7-win64-shared.7z' ffmpeg-shared.7z
-  - ps: Start-FileDownload 'http://ffmpeg.zeranoe.com/builds/win64/shared/ffmpeg-2.7-win64-dev.7z' ffmpeg-dev.7z
-  - 7z x ffmpeg-shared.7z
-  - 7z x ffmpeg-dev.7z
+  - ps: Start-FileDownload 'http://ffmpeg.zeranoe.com/builds/win64/dev/ffmpeg-2.7-win64-dev.7z' ffmpeg-dev.7z
+  - 7z x ffmpeg-shared.7z > NULL
+  - 7z x ffmpeg-dev.7z > NULL
   - ps: "ls"
 
 build: false  # Not a C# project, build stuff at the test step instead.
