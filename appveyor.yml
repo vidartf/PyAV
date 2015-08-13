@@ -90,8 +90,8 @@ install:
   - "%CMD_IN_ENV% pip install -r dev-requirements.txt"
 
   # Install ffmpeg
-  - ps: Start-FileDownload 'http://ffmpeg.zeranoe.com/builds/win64/shared/ffmpeg-2.7-win64-shared.7z' ffmpeg-shared.7z
-  - ps: Start-FileDownload 'http://ffmpeg.zeranoe.com/builds/win64/dev/ffmpeg-2.7-win64-dev.7z' ffmpeg-dev.7z
+  - ps: Start-FileDownload 'http://ffmpeg.zeranoe.com/builds/win%PYTHON_ARCH%/shared/ffmpeg-2.7-win%PYTHON_ARCH%-shared.7z' ffmpeg-shared.7z
+  - ps: Start-FileDownload 'http://ffmpeg.zeranoe.com/builds/win%PYTHON_ARCH%/dev/ffmpeg-2.7-win%PYTHON_ARCH%-dev.7z' ffmpeg-dev.7z
   - 7z x ffmpeg-shared.7z > NULL
   - 7z x ffmpeg-dev.7z > NULL
   - ps: "ls"
@@ -100,7 +100,7 @@ build: false  # Not a C# project, build stuff at the test step instead.
 
 before_test:
   # Need to build before tests
-  - "%CMD_IN_ENV% %PYTHON%/python setup.py build_ext --debug --include-dirs=ffmpeg-2.7-win64-dev/include --library-dirs=ffmpeg-2.7-win64-shared/lib"
+  - "%CMD_IN_ENV% %PYTHON%/python setup.py build_ext --debug --include-dirs=ffmpeg-2.7-win%PYTHON_ARCH%-dev/include --library-dirs=ffmpeg-2.7-win%PYTHON_ARCH%-shared/lib"
 
 test_script:
   # Build the compiled extension and run the project tests
