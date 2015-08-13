@@ -14,16 +14,6 @@ environment:
 
   matrix:
 
-    # Python 2.7.10 is the latest version and is not pre-installed.
-
-    - PYTHON: "C:\\Python27.10"
-      PYTHON_VERSION: "2.7.10"
-      PYTHON_ARCH: "32"
-
-    - PYTHON: "C:\\Python27.10-x64"
-      PYTHON_VERSION: "2.7.10"
-      PYTHON_ARCH: "64"
-
     # Pre-installed Python versions, which Appveyor may upgrade to
     # a later point release.
 
@@ -54,12 +44,17 @@ environment:
       PYTHON_ARCH: "64"
       WINDOWS_SDK_VERSION: "v7.1"
 
-    # Also build on a Python version not pre-installed by Appveyor.
-    # See: https://github.com/ogrisel/python-appveyor-demo/issues/10
+    # Python 2.7.10 is the latest version and is not pre-installed.
+    # Build this last, as install takes a bit of time
 
-    - PYTHON: "C:\\Python266"
-      PYTHON_VERSION: "2.6.6"
+    - PYTHON: "C:\\Python27.10"
+      PYTHON_VERSION: "2.7.10"
       PYTHON_ARCH: "32"
+
+    - PYTHON: "C:\\Python27.10-x64"
+      PYTHON_VERSION: "2.7.10"
+      PYTHON_ARCH: "64"
+      WINDOWS_SDK_VERSION: "v7.1"
 
 init:
   - "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%"
