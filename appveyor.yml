@@ -96,11 +96,15 @@ install:
   - 7z x ffmpeg-dev.7z > NULL
   - "SET PATH=%cd%ffmpeg-2.7-win%PYTHON_ARCH%-share\\bin;%PATH%"
 
+  # Install missing C99 headers for MSVC
+  - ps: Start-FileDownload ('https://msinttypes.googlecode.com/files/msinttypes-r26.zip') msinttypes.zip
+  - 7z e msinttypes.zip -omsinttypes
+
 build: false  # Not a C# project, build stuff at the test step instead.
 
 before_test:
   # Need to build before tests
-  - "%CMD_IN_ENV% %PYTHON%/python setup.py build_ext --debug --ffmpeg-dir=%cd%\\ffmpeg-2.7-win%PYTHON_ARCH%-dev"
+  - "%CMD_IN_ENV% %PYTHON%/python setup.py build_ext --debug --ffmpeg-dir=%cd%\\ffmpeg-2.7-win%PYTHON_ARCH%-dev --include-dirs=%cd%\\msinttypes"
 
 test_script:
   # Build the compiled extension and run the project tests
