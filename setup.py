@@ -161,7 +161,7 @@ def new_compiler(*args, **kwargs):
 
     """
     cc = _new_compiler(*args, **kwargs)
-    if kwargs.pop('silent', True):
+    if kwargs.pop('silent', False):
         cc.spawn = _CCompiler_spawn_silent
     return cc
 
