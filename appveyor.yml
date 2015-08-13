@@ -90,11 +90,10 @@ install:
   - "%CMD_IN_ENV% pip install -r dev-requirements.txt"
 
   # Install ffmpeg
-  - ps: Start-FileDownload ('http://ffmpeg.zeranoe.com/builds/win' + $env:PYTHON_ARCH + '/shared/ffmpeg-2.7-win' + $env:PYTHON_ARCH '-shared.7z') ffmpeg-shared.7z
+  - ps: Start-FileDownload ('http://ffmpeg.zeranoe.com/builds/win' + $env:PYTHON_ARCH + '/shared/ffmpeg-2.7-win' + $env:PYTHON_ARCH + '-shared.7z') ffmpeg-shared.7z
   - ps: Start-FileDownload ('http://ffmpeg.zeranoe.com/builds/win' + $env:PYTHON_ARCH + '/dev/ffmpeg-2.7-win' + $env:PYTHON_ARCH + '-dev.7z') ffmpeg-dev.7z
   - 7z x ffmpeg-shared.7z > NULL
   - 7z x ffmpeg-dev.7z > NULL
-  - ps: "ls"
 
 build: false  # Not a C# project, build stuff at the test step instead.
 
