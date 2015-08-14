@@ -94,7 +94,7 @@ install:
   - ps: Start-FileDownload ('http://ffmpeg.zeranoe.com/builds/win' + $env:PYTHON_ARCH + '/dev/ffmpeg-2.7-win' + $env:PYTHON_ARCH + '-dev.7z') ffmpeg-dev.7z
   - 7z x ffmpeg-shared.7z > NULL
   - 7z x ffmpeg-dev.7z > NULL
-  - "SET PATH=%cd%ffmpeg-2.7-win%PYTHON_ARCH%-shared\\bin;%PATH%"
+  - "SET PATH=%cd%\\ffmpeg-2.7-win%PYTHON_ARCH%-shared\\bin;%PATH%"
 
   # Install missing C99 headers for MSVC
   - ps: Start-FileDownload ('https://msinttypes.googlecode.com/files/msinttypes-r26.zip') msinttypes.zip
