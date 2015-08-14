@@ -361,11 +361,15 @@ class ReflectCommand(Command):
             ('libraries', 'libraries'),
             ('library_dirs', 'library_dirs'),
             ('no_pkg_config', 'no_pkg_config'),
-		)
-		# Need to do this ourself, since no inheritance from build_ext:
-        if isinstance(self.include_dirs, basestring):
+        )
+        # Need to do this ourself, since no inheritance from build_ext:
+        try:
+            str_base = basestring
+        except NameError:
+            str_base = str
+        if isinstance(self.include_dirs, str_base):
             self.include_dirs = self.include_dirs.split(os.pathsep)
-        if isinstance(self.library_dirs, basestring):
+        if isinstance(self.library_dirs, str_base):
             self.library_dirs = str.split(self.library_dirs, os.pathsep)
 
     def run(self):
