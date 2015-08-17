@@ -56,6 +56,7 @@ def makedirs(path):
 
 _start_time = datetime.datetime.now()
 
+
 def _sandbox(timed=False):
     root = os.path.abspath(os.path.join(
         __file__, '..', '..',
@@ -68,12 +69,6 @@ def _sandbox(timed=False):
     ) if timed else root
     if not os.path.exists(sandbox):
         os.makedirs(sandbox)
-        last = os.path.join(root, 'last')
-        try:
-            os.unlink(last)
-        except OSError:
-            pass
-        os.symlink(sandbox, last)
     return sandbox
 
 
